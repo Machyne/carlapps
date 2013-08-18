@@ -1,0 +1,28 @@
+/* @license
+ * MyFonts Webfont Build ID 2602089, 2013-07-14T23:43:48-0400
+ * 
+ * The fonts listed in this notice are subject to the End User License
+ * Agreement(s) entered into by the website owner. All other parties are 
+ * explicitly restricted from using the Licensed Webfonts(s).
+ * 
+ * You may obtain a valid license at the URLs below.
+ * 
+ * Webfont: Nanami Light by Thinkdust
+ * URL: http://www.myfonts.com/fonts/thinkdust/nanami/light/
+ * Copyright: Copyright (c) 2013 by Thinkdust. All rights reserved.
+ * 
+ * 
+ * License: http://www.myfonts.com/viewlicense?type=web&buildid=2602089
+ * 
+ * © 2013 MyFonts Inc
+*/
+
+
+/* @import must be at top of file, otherwise CSS will not work */
+@import url("//hello.myfonts.net/count/27b469");
+
+@font-face {font-family: 'Nanami';font-weight: 100;src: url('../fonts/nanamithin.otf') format('opentype');}
+@font-face {font-family: 'Nanami';font-weight: normal;src: url('../fonts/nanami.otf') format('opentype');}
+@font-face {font-family: 'Nanami';font-weight: bold;src: url('../fonts/nanamibold.otf') format('opentype');}
+@font-face {font-family: 'Nanami';font-weight: lighter; src: url('webfonts/27B469_0_0.eot');src: url('webfonts/27B469_0_0.eot?#iefix') format('embedded-opentype'),url('webfonts/27B469_0_0.woff') format('woff'),url('webfonts/27B469_0_0.ttf') format('truetype');}
+@font-face {font-family: 'OpenSans';font-weight: normal; src: url('../fonts/OpenSans-Regular.ttf') format('truetype');}
