@@ -1,0 +1,35 @@
+<h1>Listing nnb</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Content</th>
+      <th>Contact</th>
+      <th>Appeared</th>
+      <th>Date</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @nnb.each do |nnb| %>
+      <tr>
+        <td><%= nnb.type %></td>
+        <td><%= nnb.content %></td>
+        <td><%= nnb.contact %></td>
+        <td><%= nnb.appeared %></td>
+        <td><%= nnb.date %></td>
+        <td><%= link_to 'Show', nnb %></td>
+        <td><%= link_to 'Edit', edit_nnb_path(nnb) %></td>
+        <td><%= link_to 'Destroy', nnb, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Nnb', new_nnb_path %>

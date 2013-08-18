@@ -1,4 +1,6 @@
 Carlapps::Application.routes.draw do
+  resources :nnb
+
   get "bulletin/index"
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

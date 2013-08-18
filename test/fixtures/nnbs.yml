@@ -1,0 +1,15 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  type: 
+  content: MyString
+  contact: MyString
+  appeared: 
+  date: 2013-08-18
+
+two:
+  type: 
+  content: MyString
+  contact: MyString
+  appeared: 
+  date: 2013-08-18
