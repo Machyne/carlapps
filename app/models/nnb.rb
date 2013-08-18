@@ -5,4 +5,9 @@ class Nnb
   field :contact, type: String
   field :appeared, type: Array
   field :date, type: Date
+
+  def to_ko
+    {:type => type, :content => content, :contact => contact, :appeared => appeared, :date => date}
+  end
+
 end

@@ -1,28 +1,14 @@
-class NnbController < ApplicationController
+class NnbsController < ApplicationController
   before_action :set_nnb, only: [:show, :edit, :update, :destroy]
 
-  # GET /nnb
-  # GET /nnb.json
+  # GET /nnbs
   def index
-    @nnb = Nnb.all
+    @nnbs = Nnb.all
+    render json: {nnbs: @nnbs.map{ |n| n.to_ko }}
   end
 
-  # GET /nnb/1
-  # GET /nnb/1.json
-  def show
-  end
-
-  # GET /nnb/new
-  def new
-    @nnb = Nnb.new
-  end
-
-  # GET /nnb/1/edit
-  def edit
-  end
-
-  # POST /nnb
-  # POST /nnb.json
+  # POST /nnbs
+  # POST /nnbs.json
   def create
     @nnb = Nnb.new(nnb_params)
 
@@ -37,8 +23,8 @@ class NnbController < ApplicationController
     end
   end
 
-  # PATCH/PUT /nnb/1
-  # PATCH/PUT /nnb/1.json
+  # PATCH/PUT /nnbs/1
+  # PATCH/PUT /nnbs/1.json
   def update
     respond_to do |format|
       if @nnb.update(nnb_params)
@@ -51,12 +37,12 @@ class NnbController < ApplicationController
     end
   end
 
-  # DELETE /nnb/1
-  # DELETE /nnb/1.json
+  # DELETE /nnbs/1
+  # DELETE /nnbs/1.json
   def destroy
     @nnb.destroy
     respond_to do |format|
-      format.html { redirect_to nnb_url }
+      format.html { redirect_to nnbs_url }
       format.json { head :no_content }
     end
   end

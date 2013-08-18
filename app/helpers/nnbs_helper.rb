@@ -1,0 +1,2 @@
+module NnbsHelper
+end

@@ -5,11 +5,11 @@ one:
   content: MyString
   contact: MyString
   appeared: 
-  date: 2013-08-18
+  date: 
 
 two:
   type: 
   content: MyString
   contact: MyString
   appeared: 
-  date: 2013-08-18
+  date: 
