@@ -10,13 +10,24 @@ function NnbViewModel () {
 
     var self = this;
     self.nnbs = ko.observableArray([]);
+    self.rows = ko.computed(function(){
+        var ret = [];
+        var current = [];
+        $.each(self.nnbs(), function(i, nnb){
+            if (i%3==0 && i!=0) {ret.push(current); current = [];};
+            current.push(nnb);
+        });
+        ret.push(current);
+        return ret;
+    },self);
     function getAjaxData () {
-        return {};
+        return {
+            date: new Date(),
+        };
     }
     self.getNnbs = function() {
         $.get("/nnbs/", getAjaxData(), 
               function(d){
-                console.dir(d);
                 $.each(d.nnbs, function(i, post) {
                     self.nnbs.push(new Nnb(post));
                 });

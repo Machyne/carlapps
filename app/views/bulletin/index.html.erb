@@ -29,11 +29,20 @@ $(document).ready(function() {
     <h1><a id="carlapps">CarlApps</a><a id="app_name"><span><span></span></span>Bulletin</a></h1>
 
     <hr class="rule rule--dashed">
-    <div data-bind="foreach: nnbs">
-        <time data-bind="attr:{datetime:date},text:date"></time>
-        <p data-bind="html: content"></p>
-        by <span data-bind="text: contact"></span>
+    
+    <div class="section">
+        <h2>Today, <span class="date" data-bind="text: (new Date())"></span></h2>
+        <div class="fader"><div></div></div>
+        <div class="barground"><div></div></div>
+        <div class="content">
+            <!-- ko foreach: rows -->
+<div class="grid" div data-bind="foreach: $data"><div class="grid__item palm-one-whole one-third"><p data-bind="html: content"></p></div></div>
+            <!-- /ko -->
+        </div>
     </div>
+
+    <hr class="rule rule--dashed">
+
     <div class="section">
         <h2>Monday, <span class="date">September 14</span></h2>
         <div class="fader"><div></div></div>

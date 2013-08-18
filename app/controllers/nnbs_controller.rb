@@ -3,7 +3,17 @@ class NnbsController < ApplicationController
 
   # GET /nnbs
   def index
-    @nnbs = Nnb.all
+    query = {}
+    ['appeared','contact','content', 'date','type'].each do |k|
+      query[k] = params[k] if params[k]
+    end
+    query = hkeys_to_sym(query)
+    p query
+    @nnbs = if query.empty?
+              Nnb.all
+            else
+              Nnb.where(**query)
+            end
     render json: {nnbs: @nnbs.map{ |n| n.to_ko }}
   end
 
@@ -56,5 +66,13 @@ class NnbsController < ApplicationController
     # Never trust parameters from the scary internet, only allow the white list through.
     def nnb_params
       params.require(:nnb).permit(:type, :content, :contact, :appeared, :date)
+    end
+
+    def hkeys_to_sym(my_hash)
+      if my_hash.class == Hash
+        my_hash.inject({}){|memo,(k,v)| memo[k.to_sym] = hkeys_to_sym(v); memo}
+      else
+        my_hash
+      end
     end
 end
