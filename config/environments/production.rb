@@ -77,4 +77,12 @@ Carlapps::Application.configure do
 
   # Use default logging formatter so that PID and timestamp are not suppressed.
   config.log_formatter = ::Logger::Formatter.new
+
+  # Add the fonts path
+  config.assets.paths << Rails.root.join('app', 'assets', 'fonts')
+  config.assets.paths << Rails.root.join('vendor', 'assets', 'fonts')
+  config.assets.paths << Rails.root.join('public', 'assets', 'fonts')
+  
+  # Precompile additional assets
+  config.assets.precompile += %w( .svg .eot .woff .ttf )
 end
