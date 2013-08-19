@@ -15,12 +15,20 @@ function NnbViewModel () {
     self.nnbs = ko.observableArray([]);
     self.makeRows = function(arr){
         var ret = [];
-        var current = [];
-        $.each(arr, function(i, nnb){
-            if (i%3==0 && i!=0) {ret.push(current); current = [];};
-            current.push(nnb);
-        });
-        ret.push(current);
+        var arrLenght = arr.length;
+        var ar3f = Math.floor(arrLenght/3);
+        var c1Len = Math.ceil(arrLenght/3);
+        var c2Len = (arrLenght%3)==2? ar3f + 1: ar3f;
+        var c3Len = arrLenght - c1Len - c2Len;
+        for (var i = 0; i < c1Len; i++) {
+            if (i + 1 <= c3Len) {
+                ret.push([arr[i], arr[i+c1Len], arr[i+c1Len+c2Len]]);
+            }else if(i + 1 <= c2Len){
+                ret.push([arr[i], arr[i+c1Len]]);
+            }else{
+                ret.push(arr[i]);
+            };
+        };
         return ret;
     };
 
