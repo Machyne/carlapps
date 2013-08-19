@@ -14,7 +14,8 @@ class NnbsController < ApplicationController
             else
               Nnb.where(**query)
             end
-    render json: {nnbs: @nnbs.map{ |n| n.to_ko }}
+    final_hash = {nnbs: @nnbs.map{ |n| n.to_ko }}    
+    render json: final_hash
   end
 
   # POST /nnbs
