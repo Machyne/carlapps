@@ -10,7 +10,7 @@ function NnbViewModel () {
     }
     var self = this;
     var types = ["events", "general", "wanted", "for sale", "lost and found", "housing", "ride share"];
-    self.date = ko.observable(new Date());
+    self.date = ko.observable(new Date(2013,7,18));
     self.niceDate = ko.computed(function(){return self.date().toDateString();}, self);
     self.nnbs = ko.observableArray([]);
     self.makeRows = function(arr){
@@ -62,7 +62,8 @@ function NnbViewModel () {
     // ==================
     function getAjaxData () {
         return {
-            date: new Date(),
+            // date: self.date(), // this has results
+            appeared: self.date(), // this does not.
         };
     }
     self.getNnbs = function() {

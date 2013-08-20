@@ -4,6 +4,7 @@ class Nnb
   field :content, type: String
   field :contact, type: String
   field :appeared, type: Array
+  field :appearedIndex, type: Array
   field :date, type: Date
 
   def to_ko

@@ -15,7 +15,7 @@ class NnbsController < ApplicationController
               Nnb.where(**query)
             end
     final_hash = {nnbs: @nnbs.map{ |n| n.to_ko }}    
-    render json: final_hash
+    render json: final_hash, :handlers => [:erb]
   end
 
   # POST /nnbs
