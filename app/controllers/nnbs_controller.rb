@@ -4,16 +4,14 @@ class NnbsController < ApplicationController
   # GET /nnbs
   def index
     query = {}
-    ['appeared','contact','content', 'date','type'].each do |k|
+    ['contact','content', 'date','type'].each do |k|
       query[k] = params[k] if params[k]
     end
+    query['appeared'] = hash_strs_to_dates(params['appeared']) if params['appeared']
     query = hkeys_to_sym(query)
+    p query[:appeared].class
     p query
-    @nnbs = if query.empty?
-              Nnb.all
-            else
-              Nnb.where(**query)
-            end
+    @nnbs = Nnb.all(**query)
     final_hash = {nnbs: @nnbs.map{ |n| n.to_ko }}    
     render json: final_hash, :handlers => [:erb]
   end
@@ -22,7 +20,6 @@ class NnbsController < ApplicationController
   # POST /nnbs.json
   def create
     @nnb = Nnb.new(nnb_params)
-
     respond_to do |format|
       if @nnb.save
         format.html { redirect_to @nnb, notice: 'Nnb was successfully created.' }
@@ -71,9 +68,20 @@ class NnbsController < ApplicationController
 
     def hkeys_to_sym(my_hash)
       if my_hash.class == Hash
-        my_hash.inject({}){|memo,(k,v)| memo[k.to_sym] = hkeys_to_sym(v); memo}
+        my_hash.inject({}){|new_hash,(k,v)| new_hash[k.to_sym] = hkeys_to_sym(v); new_hash}
       else
         my_hash
       end
     end
+
+    def hash_strs_to_dates(my_hash)
+      if my_hash.class == Hash
+        my_hash.inject({}){|new_hash,(k,v)| new_hash[k] = hash_strs_to_dates(v); new_hash}
+      elsif (my_hash.class == String) && (my_hash == my_hash[/\A[\d-]*T[\d\.:]*Z\z/])
+        Date.parse(my_hash)
+      else
+        my_hash
+      end
+    end
+
 end
