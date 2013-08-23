@@ -8,10 +8,9 @@ class NnbsController < ApplicationController
       query[k] = params[k] if params[k]
     end
     query['appeared'] = hash_strs_to_dates(params['appeared']) if params['appeared']
-    query = hkeys_to_sym(query)
-    p query[:appeared].class
-    p query
+    query = hkeys_to_sym query
     @nnbs = Nnb.all(**query)
+    @nnbs = Nnb.sort_by_index(@nnbs, query[:appeared]) if query[:appeared] && query[:appeared].class==Date
     final_hash = {nnbs: @nnbs.map{ |n| n.to_ko }}    
     render json: final_hash, :handlers => [:erb]
   end

@@ -5,13 +5,43 @@ function NnbViewModel () {
         self.contact = ko.observable(data.contact);
         var first = data.content.split(" ", 2).join(" ");
         self.content = ko.observable('<span class="first">' + first + '</span>' + data.content.slice(first.length));
-        self.date = ko.observable(data.date);
+        self.date = ko.observable(new Date(data.date));
         self.type = ko.observable(data.type);
     }
     var self = this;
     var types = ["events", "general", "wanted", "for sale", "lost and found", "housing", "ride share"];
-    self.date = ko.observable(new Date("2013-08-19"));
+    
+    // ==================
+    // All Date info
+    // ==================    
+    self.date = ko.observable(new Date());    
+    self.changeDate = function(addDays) {
+        return function(){
+            var d = self.date();
+            d.setDate(d.getDate() + addDays);
+            self.date(d);
+        };
+    };
+    $(document).ready(function(){
+        console.log('hi');
+        $("#datepicker").change(function(){
+            var d = new Date($("#datepicker").val());
+            var d2 = self.date();
+            if (d.getYear()  == d2.getYear()  &&
+                d.getMonth() == d2.getMonth() &&
+                d.getDate()  == d2.getDate()) return;
+            self.date(d);
+        });
+    });
+    self.date.subscribe(function(){
+        $('#datepicker').val(self.date().toJSON().slice(0,10));
+        self.getNnbs();
+    });
     self.niceDate = ko.computed(function(){return self.date().toDateString();}, self);
+    
+    // ==================
+    // Layout of Nnbs
+    // ==================
     self.nnbs = ko.observableArray([]);
     self.makeRows = function(arr){
         var ret = [];
@@ -68,6 +98,7 @@ function NnbViewModel () {
     self.getNnbs = function() {
         $.get("/nnbs/", getAjaxData(), 
               function(d){
+                self.nnbs([]);
                 $.each(d.nnbs, function(i, post) {
                     self.nnbs.push(new Nnb(post));
                 });
