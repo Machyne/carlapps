@@ -4,7 +4,7 @@ class NnbsController < ApplicationController
   # GET /nnbs
   def index
     query = {}
-    ['contact','content', 'date','type'].each do |k|
+    ['contact', 'content', 'date', 'type'].each do |k|
       query[k] = params[k] if params[k]
     end
     query['appeared'] = hash_strs_to_dates(params['appeared']) if params['appeared']

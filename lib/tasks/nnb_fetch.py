@@ -1,3 +1,4 @@
+# magic comment (DNE) use encoding: utf-8 because we have to translate the symbol of death a.k.a â��
 #
 # MongoDB documents:
 #
@@ -59,7 +60,7 @@ def get_todays_posts():
 	sections = find_sections_in_html(today_html)
 	# Process each section's content into an array of posts as text
 	# (Parse html to text, split into array of posts, remove surrounding whitespace, leave out empty strings)
-	sections = [( title, filter(bool, [post.strip() for post in parse_html_content(content).split('\n')])) \
+	sections = [( title, filter(bool, [post.strip() for post in posts_from_content(content)])) \
 		for (title, content) in sections]
 	# Create a dict for each post
 	# Add anchors for users, email addresses, and web addresses
@@ -70,8 +71,10 @@ def get_todays_posts():
 		type, date = type_and_date_from_title_and_publish_date(section[0], publish_date)
 		for post in section[1]:
 			post_with_anchors, contact = add_anchors_and_get_contact(post)
-			new_post = {"type":type, "content":post_with_anchors, "contact":contact,
-						"appeared":[publish_date], "appearedIndex":[post_index], "date":date}
+			new_post = {"type":type, "content":post_with_anchors,
+					"appeared":[publish_date], "appearedIndex":[post_index]}
+			new_post["contact"] = contact if contact
+			new_post["date"] = date if date
 			todays_posts.append(new_post)
 			post_index += 1
 	return todays_posts
@@ -96,16 +99,14 @@ def get_html_for_date(date):
 # Title and content should be parsed to remove HTML tags and entities
 def find_sections_in_html(nnb_html):
 	flags = re.DOTALL | re.IGNORECASE
-	pattern = re.compile(r'<br><b><u>(.*?)</u></b><br>(.*?)</td></tr>(?:</tbody>)?</table>', flags)
+	pattern = re.compile(r'<p><br><b><u>(.*?)</u></b><br>(.*?)</p></td></tr>(?:</tbody>)?</table>', flags)
 	return re.findall(pattern, nnb_html)
 
-# Removes HTML tags and entities from content
-# TODO: Make sure this is righ--right now we remove tags and nbsp
-def parse_html_content(content):
-	# tags_and_entities = re.compile(r'<.*?>|&.*?;')
-	tags_and_nbsp = re.compile(r'<.*?>|&nbsp;')
-	parsed = re.sub(tags_and_nbsp, (lambda match_obj: ""), content)
-	return parsed
+# Split posts, remove nbsp, translate â��, remove extra newlines
+def posts_from_content(content):
+	parsed = re.sub("&nbsp;", lambda _: "", content)
+	parsed = re.sub(r"\xc3\xa2\xef\xbf\xbd\xef\xbf\xbd", lambda _: "'", parsed)
+	return parsed.split('<br class="ad">')
 
 def get_publish_date_from_html(nnb_html):
 	flags = re.IGNORECASE
@@ -183,15 +184,16 @@ def add_anchors_and_get_contact(post):
 				# nothing special
 				new_post += word + separator
 	# Wrap an anchor around all web addresses
-	# Future improvement to regex should use a list of known tld's to match or file extensions to avoid matching with
-	web_address_match = re.compile(r'(?:^|\W)((?:[\w\-/:]+?\.)?[\w\-]+\.\w{2,3}(?:[\./][\w\-\./#\?]*?)??)[^\w/]?(?:$|[^\w\-\./#\?])')
+	web_address_match = re.compile(r'(^|\s)((?:[\w\-/:]+?\.)?[\w\-]+\.\w{2,3}(?:[\./][\w\-\./#\?]*?)??)([^\w/]?(?:$|[^\w\-\./#\?]))')
 	new_post = re.sub(web_address_match, wrap_web_address_match, new_post)
 	return new_post, contact
 
 def wrap_web_address_match(match):
-	link = match.group(1)
+	pre = match.group(1)
+	link = match.group(2)
+	post = match.group(3)
 	href = "http://" + link.split("://")[-1]
-	return '<a href="' + href + '"class="web"target="_blank">' + link + '</a>'
+	return pre + '<a href="' + href + '"class="web"target="_blank">' + link + '</a>' + post
 
 if __name__=="__main__":
 	# TODO: Give the correct address and port for the database

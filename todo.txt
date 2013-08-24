@@ -1,10 +1,11 @@
+Bulletin todo list August 22
 - Events sectioned by date
 - No more pivot
 - No time zone bullshit
-- Fix the email links (my fault)
+√ Fix the email links (my fault)
 - Loading message
 - Long links have to be split
-- Make � look like apostrophes or whatever it's supposed to be
-- Fix orphan post phenomenon
-- Switch from Open Sans light to Helvetica light
+√ Make � look like apostrophes or whatever it's supposed to be
+√ Fix orphan post phenomenon
+√ Switch from Open Sans light to Helvetica light
 - Fix up date picker
