@@ -1,18 +1,17 @@
-@import "inuit.css/inuit";
-//
-
-$baseline: 0.785714rem;
 $theme: #ff7f7f;
 
-// ------- // NORMALIZATION // ------- //
-a{
+// ------- // GENERAL // ------- //
+a {
     text-decoration: none;
     color: inherit;
-    &:hover, &:focus{
-        text-decoration: none;
-    }
 }
-
+p {
+    font-family: Helvetica, sans-serif;
+    font-weight: lighter;
+    font-size: 0.875rem; // 14px
+    line-height: 1.25rem;
+    margin-bottom: 1.25rem;
+}
 
 // ------- // TOOLTIP // ------- //
 #tooltip {
@@ -30,9 +29,8 @@ a{
 
 // ------- // BODY AND CONTAINER // ------- //
 body {
-    /* background: url('../img/grid.png'); */
     border-left: .1875rem solid $theme;
-    padding-top: 3rem;
+    padding: 3rem 0;
     height: 100%;
 }
 .container {
@@ -54,30 +52,66 @@ body {
     margin-right: 0.5rem;
 }
 
+// ------- // TIMELINE // ------- //
+.timeline {
+    display: block;
+    height: 5.75rem;
+
+    div {
+        float: left;
+    }
+
+    .left {
+        width: 15%;
+        padding-top: 2.15rem;
+        text-align: left;
+    }
+
+    .middle {
+        width: 70%;
+        height: 5.75rem;
+        text-align: center;
+    }
+
+    .right {
+        width: 15%;
+        padding-top: 2.15rem;
+        text-align: right;
+    }
+
+    input {
+        text-align: center;
+    }
+}
+
+#title {
+    font-family: Nanami;
+    font-style: italic;
+    letter-spacing: .2rem;
+    text-align: center;
+    margin: 1rem 0;
+}
+
 // ------- // CONTENT // ------- //
 .content p {
-    font-family: Helvetica, sans-serif;
-    font-weight: lighter;
     color: #444;
-    font-size: 0.875em; // 14px
-    line-height: 1.25rem;
-    margin-bottom: 1.25rem;
 
-    a {
+    a:link {
+
         display: inline-block;
         vertical-align: top;
         height: 1.25em;
         border-bottom: .1em solid $theme;
         transition: color .5s ease, border-width .3s ease;
 
-        &:hover {
+        &:hover, &:focus {
             color: #fff;
             border-width: 1.25em;
         }
     }
 }
 
-// ------- // TITLE // ------- //
+// ------- // HEADING // ------- //
 h1 {
     cursor: pointer;
     font-weight: 100;
@@ -85,7 +119,7 @@ h1 {
     line-height: 3.25rem;
     margin-left: -.06em;
     margin-bottom: 1.25rem;
-    margin-top: .4rem;
+    //margin-top: .4rem;
 
     #carlapps {
         @include media-query(palm) { display: none; }
