@@ -163,12 +163,44 @@ function NnbViewModel () {
                     buffer[i] = new Nnb(post);
                 });
                 self.nnbs(buffer);
+                self.initLinksToFit();
             }, 'json');
     };
 
     // ====================== //
-    // Effects and animations //
+    // Styling and animations //
     // ====================== //
+
+    var trimTail = /.*\W./;
+
+    self.initLinksToFit = function() {
+        $('.web').each(function(i) {
+            $(this).data("original", $(this).text());
+        });
+        self.trimLinksToFit();
+    }
+
+    self.trimLinksToFit = function() {
+        console.log('trim');
+        var colWidth = $('.content .grid__item').width();
+        $('.web').each(function(i) {
+            var text = $(this).data("original");
+            $(this).text(text);
+            while ($(this).width() > colWidth) {
+                var text = text.match(trimTail)[0];
+                var len = text.length;
+                if (text[len - 2] == '/') {
+                    text = text.slice(0, len - 1);
+                } else {
+                    text = text.slice(0, len - 2);
+                }
+                $(this).text(text + "...");
+            }
+        });
+    }
+
+    // Throttled
+    $(window).resize($.throttle(self.trimLinksToFit, 300, true));
 
     self.collapse = function(item, event) {
         var p = $(event.target).parent()

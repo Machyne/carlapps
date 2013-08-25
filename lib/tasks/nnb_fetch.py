@@ -7,16 +7,16 @@
 #
 #                    BSON                Python
 #    type            String
-#    content            String
-#    contact            String
+#    content         String
+#    contact         String
 #    appeared        (Date) Array        [datetime.datetime]
-#    appearedIndex    (Integer) Array        [int]
+#    appearedIndex   (Integer) Array     [int]
 #    date            Date                datetime.datetime
 #
 # User:
 #
 #                    BSON
-#    active            Boolean
+#    active          Boolean
 #    user            String
 
 from pymongo import MongoClient
@@ -40,9 +40,10 @@ def put_todays_nnb_in_mongo(client):
     todays_posts = get_todays_posts()
     for post in todays_posts:
         # Note that a duplicate can occur on the same day
-        duplicate = nnb_collection.find_one({"type": post["type"],
-                                             "date": post["date"],
-                                             "content": post["content"]})
+        duplicate_query = {"type": post["type"], "content": post["content"]}
+        if "date" in post:
+            duplicate_query["date"] = post["date"]
+        duplicate = nnb_collection.find_one(duplicate_query)
         if duplicate:
             if post["appeared"] not in duplicate["appeared"]:
                 duplicate["appeared"] += post["appeared"]
@@ -119,8 +120,7 @@ def get_html_for_date(date):
 # Title and content should be parsed to remove HTML tags and entities
 def find_sections_in_html(nnb_html):
     flags = re.DOTALL | re.IGNORECASE
-    #TODO table
-    r = r'<p><br><b><u>(.*?)</u></b><br>(.*?)</p></td></tr>(?:</tbody>)?</>'
+    r = r'<br><b><u>(.*?)</u></b><br>(.*?)</p></td></tr>(?:</tbody>)?</table>'
     pattern = re.compile(r, flags)
     return re.findall(pattern, nnb_html)
 
@@ -182,7 +182,7 @@ def add_anchors_and_get_contact(post):
         word = word_split[i * 2]
         separator = word_split[i * 2 + 1]
         # schillek    @        gmail    .        com
-        # i * 2        +1        +1        +1        +1
+        # i * 2       +1       +1       +1       +1
         is_email = separator == "@" and (len(word_split) - i * 2) > 5
         is_email = is_email and word_split[i * 2 + 3] == "."
         if is_email:
@@ -220,25 +220,30 @@ def add_anchors_and_get_contact(post):
                 # nothing special
                 new_post += word + separator
     # Wrap an anchor around all web addresses
-    r = r'(^|\s)((?:[\w\-/:]+?\.)?[\w\-]+\.\w{2,3}(?:[\./][\w\-\./#\?]*?)??)([^\w/]?(?:$|[^\w\-\./#\?]))'
+    re_url = r'((?:[\w\-/:]+?\.)?[\w\-]+\.\w{2,3}(?:[\./][\w\-\./#\?]*?)??)'
+    r = r'(^|\s)' + re_url + '([^\w/]?(?:$|[^\w\-\./#\?]))'
     web_address_match = re.compile(r)
     new_post = re.sub(web_address_match, wrap_web_address_match, new_post)
     return new_post, contact
+
 
 def wrap_web_address_match(match):
     pre = match.group(1)
     link = match.group(2)
     post = match.group(3)
     href = "http://" + link.split("://")[-1]
-    return pre + '<a href="' + href + '"class="web"target="_blank">' + link + '</a>' + post
+    return pre + '<a href="' + href + '"class="web"target="_blank">' + \
+        link + '</a>' + post
 
-if __name__=="__main__":
+
+if __name__ == "__main__":
     # TODO: Give the correct address and port for the database
     # TODO: Make sure user docs can be found in the collection carlapps.users
     client = MongoClient("localhost", 27017)
     put_todays_nnb_in_mongo(client)
 
     # Testing
-    # load_global_users_set_from_collection(MongoClient('localhost', 27017).pydb.users)
+    # load_global_users_set_from_collection(
+        # MongoClient('localhost', 27017).pydb.users)
     # for a in get_todays_posts():
     #     print a, '\n'

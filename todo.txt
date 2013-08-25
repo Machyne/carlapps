@@ -9,7 +9,7 @@ Bulletin todo list August 22
 √ No time zone bullshit
 √ Fix the email links (my fault)
 - Loading message
-- Long links have to be split
+√ Long links have to be split
 √ Make � look like apostrophes or whatever it's supposed to be
 √ Fix orphan post phenomenon
 √ Switch from Open Sans light to Helvetica light
