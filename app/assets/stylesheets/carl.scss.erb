@@ -99,13 +99,13 @@ body {
 .content p {
     color: #444;
 
-    a:link {
-
+ // Don't add :link, it seems to make the anchors miss some of their styling
+    a {
         display: inline-block;
         vertical-align: top;
         height: 1.25em;
         border-bottom: .1em solid $theme;
-        transition: color .5s ease, border-width .3s ease;
+        @include vendor(transition, color .5s ease, border-width .3s ease);
 
         &:hover, &:focus {
             color: #fff;
@@ -122,13 +122,12 @@ h1 {
     line-height: 3.25rem;
     margin-left: -.06em;
     margin-bottom: 1.25rem;
-    //margin-top: .4rem;
 
     #carlapps {
         @include media-query(palm) { display: none; }
         margin-right: .85em;
         color: #a9a9a9;
-        transition: color 0.4s ease;
+        @include vendor(transition, color 0.4s ease);
 
         &:hover {
             color: #000;
@@ -137,7 +136,7 @@ h1 {
     #app_name {
         display: inline-block;
         color: #262626;
-        transition: color 0.4s ease;
+        @include vendor(transition, color 0.4s ease);
         @include media-query(palm) { padding-left: .3em; }
 
         span {
@@ -154,7 +153,7 @@ h1 {
                 border-left: solid $theme;
                 height: .8em;
                 border-width: .2em;
-                transition: border-width 0.4s ease;
+                @include vendor(transition, border-width 0.4s ease);
             }
         }
 
@@ -188,11 +187,11 @@ h1 {
 }
 .fader div {
     z-index: -1;
-    transition: border-color .4s ease;
+    @include vendor(transition, border-color .4s ease);
 }
 .barground div {
     z-index: -2;
-    border-image: url('<%= asset_path("barground7.png") %>') 56 0 repeat space;
+    @include vendor(border-image, url('<%= asset_path("barground7.png") %>') 56 0 repeat space);
     // border-image-outset: 0 4rem 0 3rem;
 }
 
@@ -209,7 +208,7 @@ hr.rule {
         margin-left: -.03em;
         margin-bottom: 0rem;
         padding-top: 1.5rem;
-        transition: padding-top 0.4s ease, color 0.4s ease;
+        @include vendor(transition, padding-top 0.4s ease, color 0.4s ease);
 
         &:hover {
             color: rgba(140, 140, 140, 1);
