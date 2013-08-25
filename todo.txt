@@ -1,12 +1,12 @@
 Bulletin todo list August 24
-- Events are all off by one day
-- The load delay happens because nnbs is updated a single item at a time, requiring sections and columns to be recalculated for every post
+√ Events are all off by one day
+√ The load delay happens because nnbs is updated a single item at a time, requiring sections and columns to be recalculated for every post
 - Calendar looks funky on months with 6 rows
 
 Bulletin todo list August 22
 √ Events sectioned by date
 √ No more pivot
-- No time zone bullshit
+√ No time zone bullshit
 √ Fix the email links (my fault)
 - Loading message
 - Long links have to be split

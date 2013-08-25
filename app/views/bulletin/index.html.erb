@@ -10,11 +10,11 @@
     <%= javascript_include_tag "bulletin" %>
 </head>
 <body>
+
 <script type="text/javascript">
 var vm = new NnbViewModel();
 $(document).ready(function() {
     ko.applyBindings(vm);
-    vm.getNnbs();
 });
 </script>
 
@@ -33,7 +33,7 @@ $(document).ready(function() {
         <div class="middle">
             <p id="title" data-bind="text: longDate"></p>
             <p>
-                <input type="text" id="datepicker" />
+                <input id="datepicker" type="text" data-bind="value: pickerDate"/>
             </p>
         </div>
         <div class="right">

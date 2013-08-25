@@ -12,52 +12,93 @@ function NnbViewModel () {
     var types = ["events", "general", "wanted", "for sale", "lost and found", "housing", "ride share"];
     var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-    
-    // ==================
-    // All Date info
-    // ==================    
-    self.date = ko.observable(new Date());
+    var today = new Date(new Date().toDateString() + " 00:00:00 GMT");
+
+    // ================= //
+    // The selected date //
+    // ================= //
+
+    /*
+     * The dates in our database are in UTC time, which is equivalent to GMT time.
+     * Queries can return the wrong results if they use local time.
+     *
+     * Since this application uses dates but not times, all Date objects should be initialized
+     * to midnight GMT, and only the UTC versions of the getter and setter methods should be used.
+     */
+
+    // The selected date
+    self.selectedDate = ko.observable(today);
+
+    // So that we can get the selected date without subscribing to its updates
+    self.theSelectedDate = today;
+
+    // Function to call when the selected date changes
+    // This can't be done with a ko.computed since the update to self.nnbs is asynchronous
+    self.selectedDate.subscribe(function(newValue) {
+        self.theSelectedDate = newValue;
+        self.getNnbs();
+    });
+
+    // The mm/dd/yyyy date shown in the date picker
+    // Bound to selectedDate
+    self.pickerDate = ko.computed({
+        read: function() {
+            return pickerFormat(self.selectedDate());
+        },
+        write: function(value) {
+            self.selectedDate(new Date(value + " 00:00:00 GMT"));
+        }
+    });
+
     self.changeDate = function(addDays) {
         return function() {
-            var d = self.date();
-            d.setDate(d.getDate() + addDays);
-            self.date(d);
+            var d = self.selectedDate();
+            d.setUTCDate(d.getUTCDate() + addDays);
+            self.selectedDate(d);
         };
     };
-    $(document).ready(function(){
-        $("#datepicker").change(function() {
-            var d = $("#datepicker").datepicker("getDate");
-            if (sameDate(d, self.date())) return;
-            self.date(d);
-        });
-        self.update();
-    });
-    self.update = function() {
-        $('#datepicker').val(pickerFormat(self.date()));
-        self.getNnbs();
-    }
-    self.date.subscribe(self.update);
-    self.shortDate = ko.computed(function(){return self.date().toString()}, self);
-    self.longDate = ko.computed(function(){return longDate(self.date())}, self);
-    
 
-    // ==================
-    // Layout of Nnbs
-    // ==================
+    // Two different formats for the selected date
+    self.shortDate = ko.computed( function() { return self.selectedDate().toUTCString() }, self);
+    self.longDate = ko.computed( function() { return longDate(self.selectedDate()) }, self);
+    
+    // ===================== //
+    // Static date functions //
+    // ===================== //
+
+    function sameDate(d1, d2) {
+        return d1.getUTCDate() == d2.getUTCDate() && d1.getUTCMonth() == d2.getUTCMonth()
+                && d1.getUTCFullYear() == d2.getUTCFullYear();
+    }
+
+    function pickerFormat(date) {
+        var d = date.getUTCDate(), m = date.getUTCMonth() + 1, y = date.getUTCFullYear();
+        return (m < 10? "0" + m : m) + "/" + (d < 10? "0" + d : d) + "/" + y;
+    }
+
+    function longDate(date) {
+        return days[date.getUTCDay()] + ", " + months[date.getUTCMonth()] + " " + date.getUTCDate() + ", " + date.getUTCFullYear();
+    }
+
+    // ========== //
+    // NNB layout //
+    // ========== //
+
     self.nnbs = ko.observableArray([]);
 
+    // Dependencies: self.nnbs
     self.sections = ko.computed(function() {
         var ret = {}
         for (var i = 0; i < types.length; i++) {
             var type = types[i];
-            var vals = self.nnbs().filter(function(n){return n.type() == type;});
+            var vals = self.nnbs().filter( function(n) { return n.type() == type; });
             if (type == "events") {
-                var d = new Date(self.date());
-                todayVals = vals.filter(function(n){return sameDate(n.date(), d)});
+                var d = new Date(self.theSelectedDate);
+                todayVals = vals.filter( function(n) { return sameDate(n.date(), d); });
                 todayVals.length && (ret["Today"] = todayVals);
                 for (var j = 1; j < 10; j++) {
-                    d.setDate(d.getDate() + 1);
-                    dateVals = vals.filter(function(n){return sameDate(n.date(), d)});
+                    d.setUTCDate(d.getUTCDate() + 1);
+                    dateVals = vals.filter( function(n) { return sameDate(n.date(), d); });
                     dateVals.length && (ret[longDate(d)] = dateVals)
                 }
             }
@@ -68,19 +109,22 @@ function NnbViewModel () {
         return ret;
     }, self);
 
+    // Dependencies: self.sections
     self.columns = ko.computed(function() {
-        console.log("compute columns");
+        var sections = self.sections();
         var section_columns = {};
-        var keys = Object.keys(self.sections());
+        var keys = Object.keys(sections);
         for (var ki = 0; ki < keys.length; ki++) {
-            var arr = self.sections()[keys[ki]];
+            var arr = sections[keys[ki]];
             var cols = new Array(3);
+
             // Split by number of posts
             var i1 = Math.ceil(arr.length / 3);
             var i2 = Math.ceil(arr.length * 2/ 3)
             cols[0] = arr.slice(0, i1);
             cols[1] = arr.slice(i1, i2);
             cols[2] = arr.slice(i2);
+
             // Split by number of characters
             // var sums = new Array(arr.length);
             // var totalLength = 0;
@@ -95,10 +139,36 @@ function NnbViewModel () {
             // while (j < arr.length && sums[j] < totalLength * 2 / 3) j++;
             // cols[1] = arr.slice(i, ++j);
             // cols[2] = arr.slice(j);
+
             section_columns[keys[ki]] = cols;
         }
         return section_columns;
     }, self);
+
+    // ============= //
+    // Retrieve data //
+    // ============= //
+
+    function getAjaxQueryData () {
+        return {
+            appeared: self.selectedDate().toISOString()
+        };
+    }
+
+    self.getNnbs = function() {
+        $.get("/nnbs/", getAjaxQueryData(), 
+              function(result) {
+                buffer = new Array(result.nnbs.length);
+                $.each(result.nnbs, function(i, post) {
+                    buffer[i] = new Nnb(post);
+                });
+                self.nnbs(buffer);
+            }, 'json');
+    };
+
+    // ====================== //
+    // Effects and animations //
+    // ====================== //
 
     self.collapse = function(item, event) {
         var p = $(event.target).parent()
@@ -111,37 +181,5 @@ function NnbViewModel () {
             p.children(".content").slideUp(300);
             p.addClass("selected");
         }
-    };
-
-    function sameDate(d1, d2) {
-        return d1.getDate() == d2.getDate() && d1.getMonth() == d2.getMonth()
-                && d1.getFullYear() == d2.getFullYear();
-    }
-
-    function pickerFormat(date) {
-        var d = date.getDate(), m = date.getMonth() + 1, y = date.getFullYear();
-        return (m < 10? "0" + m : m) + "/" + (d < 10? "0" + d : d) + "/" + y;
-    }
-
-    function longDate(date) {
-        return days[date.getDay()] + ", " + months[date.getMonth()] + " " + date.getDate() + ", " + date.getFullYear();
-    }
-
-    // ==================
-    // Load the data
-    // ==================
-    function getAjaxData () {
-        return {
-            appeared: self.date().toISOString()
-        };
-    }
-    self.getNnbs = function() {
-        $.get("/nnbs/", getAjaxData(), 
-              function(d){
-                self.nnbs([]);
-                $.each(d.nnbs, function(i, post) {
-                    self.nnbs.push(new Nnb(post));
-                });
-            }, 'json');
     };
 }
