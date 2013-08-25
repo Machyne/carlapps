@@ -12,7 +12,7 @@ function NnbViewModel () {
     var types = ["events", "general", "wanted", "for sale", "lost and found", "housing", "ride share"];
     var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-    var today = new Date(new Date().toDateString() + " 00:00:00 GMT");
+    var today = new Date(new Date("09/26/12").toDateString() + " 00:00:00 GMT");
 
     // ================= //
     // The selected date //
@@ -145,6 +145,58 @@ function NnbViewModel () {
         return section_columns;
     }, self);
 
+    self.dateLinks = ko.computed(getSectionLinks(true));
+    self.otherLinks = ko.computed(getSectionLinks(false));
+
+    // Dependencies: self.sections
+    // Returns an array where each element is {"label": label, "link": link}
+    function getSectionLinks(getDates) {
+        var f = function() {
+            var sections = self.sections();
+            var keys = Object.keys(sections);
+            var links = [];
+            for (var i = 0; i < keys.length; i++) {
+                if (getDates ^ (new Date(keys[i]) == 'Invalid Date')) {
+                    links.push({
+                        "label": labelForKey(keys[i]),
+                        "link": "#" + linkForKey(keys[i])
+                    });
+                }
+            };
+            return links;
+        }
+        return f;
+    }
+
+    // Dependencies: self.sections
+    self.sectionIds = ko.computed(function() {
+        var sections = self.sections();
+        var keys = Object.keys(sections);
+        var ids = {};
+        for (var i = 0; i < keys.length; i++) {
+            ids[keys[i]] = linkForKey(keys[i]);
+        };
+        return ids;
+    });
+
+    function labelForKey(key) {
+        var date = new Date(key);
+        if (date == 'Invalid Date') {
+            return key.replace(" and ", "+");
+        } else {
+            return days[date.getUTCDay()].slice(0, 3) + " " + date.getUTCDate();
+        }
+    }
+
+    function linkForKey(key) {
+        var date = new Date(key);
+        if (date == 'Invalid Date') {
+            return key.replace(/ /g, "_");
+        } else {
+            return days[date.getUTCDay()].slice(0, 3) + "_" + date.getUTCDate();
+        }
+    }
+
     // ============= //
     // Retrieve data //
     // ============= //
@@ -181,7 +233,6 @@ function NnbViewModel () {
     }
 
     self.trimLinksToFit = function() {
-        console.log('trim');
         var colWidth = $('.content .grid__item').width();
         $('.web').each(function(i) {
             var text = $(this).data("original");

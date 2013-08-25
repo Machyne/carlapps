@@ -15,8 +15,12 @@
 var vm = new NnbViewModel();
 $(document).ready(function() {
     ko.applyBindings(vm);
+    vm.getNnbs();
 });
 </script>
+
+<div id="scroll-to-top"></div>
+<div id="scroll-to-top-active"></div>
 
 <div class="container">
 
@@ -24,30 +28,41 @@ $(document).ready(function() {
 
     <hr class="rule rule--dashed">
 
-    <div class="timeline">
+    <div class="nav-bar">
         <div class="left">
             <p>
-                <a href="" data-bind="click: changeDate(-1)">&lt; previous</a>
+                <a href="" data-bind="click: changeDate(-1)"></a>
             </p>
         </div>
         <div class="middle">
-            <p id="title" data-bind="text: longDate"></p>
-            <p>
+            <p id="title">
+                <label for="datepicker" data-bind="text: longDate"></label>
+            </p>
+            <p id="date-input">
                 <input id="datepicker" type="text" data-bind="value: pickerDate"/>
             </p>
+            <nav id="sections-nav">
+                <ul data-bind="foreach: dateLinks()">
+                    <li><p><a data-bind="text: label, attr: {href: link}"></a></p></li>
+                </ul>
+                <ul data-bind="foreach: otherLinks()">
+                    <li><p><a data-bind="text: label, attr: {href: link}"></a></p></li>
+                </ul>
+            </nav>
         </div>
         <div class="right">
             <p>
-                <a href="" data-bind="click: changeDate(1)">next &gt;</a>
+                <a href="" data-bind="click: changeDate(1)"></a>
             </p>
         </div>
     </div><!--timeline-->
-    
+
     <hr class="rule rule--dashed">
-    
+
     <!-- ko foreach: Object.keys(sections()) -->
     <div class="section">
-        <h2 data-bind="click: $root.collapse, text: $data"></h2>
+        <h2 data-bind="click: $root.collapse, text: $data, attr: {id: $root.sectionIds()[$data]}">
+        </h2>
         <div class="fader"><div></div></div>
         <div class="barground"><div></div></div>
         <div class="content">
