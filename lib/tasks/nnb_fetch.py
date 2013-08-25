@@ -173,24 +173,23 @@ def add_anchors_and_get_contact(post):
     new_post = ""
     contact = None
     # Even-sized list where even indexes are words & odd indexes are separators
-    word_split = re.split('(\W+)', post) + ['']
+    # A word can include '.', '-', and '_' but must begin and end with a letter
+    word_split = re.split(r'([^\w\.\-_]+|\s\W+|\W+\s)', post) + ['']
     skip = 0
     for i in xrange(len(word_split) / 2):
         if skip:
             skip -= 1
             continue
-        word = word_split[i * 2]
-        separator = word_split[i * 2 + 1]
-        # schillek    @        gmail    .        com
-        # i * 2       +1       +1       +1       +1
-        is_email = separator == "@" and (len(word_split) - i * 2) > 5
-        is_email = is_email and word_split[i * 2 + 3] == "."
+        word, separator = word_split[i * 2], word_split[i * 2 + 1]
+        # schillek    @        gmail.com
+        # i * 2       +1       +1
+        is_email = separator == "@" and (len(word_split) - i * 2) > 3
+        is_email = is_email and '.' in word_split[i * 2 + 2]
         if is_email:
             domain = word_split[i * 2 + 2]
-            tld = word_split[i * 2 + 4]
-            separator_2 = word_split[i * 2 + 5]
-            email = word + "@" + domain + "." + tld
-            skip = 2
+            separator_2 = word_split[i * 2 + 3]
+            email = word + "@" + domain
+            skip = 1
         if word in users:
             contact = word
             if is_email:
