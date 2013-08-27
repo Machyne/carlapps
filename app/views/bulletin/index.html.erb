@@ -26,6 +26,37 @@ $(document).ready(function() {
 
     <h1><a id="carlapps">CarlApps</a><a id="app_name"><span><span></span></span>Bulletin</a></h1>
 
+    <div id="search-hidden" data-bind="slideVisible: !searchIsShowing()">
+        <a id="show-search-form" data-bind="click: function(){searchIsShowing(true)}">Search</a>
+    </div>
+    <div id="search-shown" data-bind="slideVisible: searchIsShowing">
+        <div class="search-form-row">
+            <span>Key Words</span>
+            <span class="search-input-span">
+                <input type="text" id="kw-search-val" placeholder="carleton" data-bind="event: {keydown: inputKeyListener}, valueUpdate:'afterkeydown', value: searchKeywords" />
+                <a data-bind="visible: searchKeywords()!=='', click: function(){searchKeywords('')}">&times;</a>
+            </span>
+        </div>
+        <div class="search-form-row">
+            <span>Contact</span>
+            <span class="search-input-span">
+                <input type="text" id="contact-search-val" placeholder="schiller" data-bind="event: {keydown: inputKeyListener}, valueUpdate:'afterkeydown', value: searchContact" />
+                <a data-bind="visible: searchContact()!=='', click: function(){searchContact('')}">&times;</a>
+            </span>
+        </div>
+        <div class="search-form-row">
+            <span>Category</span>
+            <span class="search-input-span">
+                <input type="text" id="type-search-val" placeholder="event" data-bind="event: {keydown: inputKeyListener}, valueUpdate:'afterkeydown', value: searchType" />
+                <a data-bind="visible: searchType()!=='', click: function(){searchType('')}">&times;</a>
+            </span>
+        </div>
+        <div class="search-form-row">
+            <span><a data-bind="click: function(){searchIsShowing(false)}">Close</a></span>
+            <span class="cell-mid"><a data-bind="click: clearSearch">Clear</a></span>
+            <span class="cell-left"><a data-bind="click: getNnbs">Search</a></span>
+        </div>
+    </div>
     <hr class="rule rule--dashed">
 
     <div class="nav-bar">

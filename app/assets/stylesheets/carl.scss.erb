@@ -85,6 +85,56 @@ body {
     margin-right: 0.5rem;
 }
 
+// ------- // SEARCH // ------- //
+#search-hidden{
+    text-align: right;
+    #show-search-form {
+        cursor: pointer; 
+    }
+}
+
+#search-shown{
+    display: table;
+    border-collapse: separate;
+    border-spacing: 10px 5px;
+    .search-form-row{
+        display: table-row;
+        span{
+            display: table-cell;
+            margin-right: 10px;
+            text-align: right;
+        }
+        a{
+            cursor: pointer;
+            font-style: italic;
+        }
+        span.cell-left{
+            text-align: left;
+        }
+        span.cell-mid{
+            text-align: center;
+        }
+        input{
+            display: table-cell;
+        }
+    }
+    .search-input-span{
+        position: relative;
+        a{
+            cursor: pointer;
+            position: absolute;
+            z-index: 1;
+            font-style: normal;
+            right: 5px;
+            top: 0px;
+        }
+        input{
+            cursor: text;
+            padding-right: 10px;
+        }
+    }
+}
+
 // ------- // DATE PICKER // ------- //
 .nav-bar {
     display: block;

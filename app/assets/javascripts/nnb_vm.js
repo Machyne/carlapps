@@ -197,19 +197,59 @@ function NnbViewModel () {
         }
     }
 
+
+    // =============== //
+    // Search Handling //
+    // =============== //
+
+    self.searchKeywords = ko.observable('');
+    self.searchContact = ko.observable('');
+    self.searchType = ko.observable('');
+    self.clearSearch = function(){
+        self.searchKeywords('');
+        self.searchContact('');
+        self.searchType('');
+    }
+
+    // Clear an input element on keydown of escape
+    // and do the search on keydown of enter
+    self.inputKeyListener = function(src, evt){
+        if(evt.keyCode==27){ // esc is 27
+            evt.currentTarget.value = '';
+        }else if(evt.keyCode == 13){ // enter is 13
+            self.getNnbs();
+        }else{
+            return true;
+        }
+    };
+    self.searchIsShowing = ko.observable(false);
+
     // ============= //
     // Retrieve data //
     // ============= //
 
     function getAjaxQueryData () {
-        return {
+        ret = {
             appeared: self.selectedDate().toISOString()
         };
+        if(self.searchKeywords()!==''){
+            ret.content = self.searchKeywords().toLowerCase();
+        }
+        if(self.searchContact()!==''){
+            ret.contact = self.searchContact();
+        }
+        if(self.searchType()!==''){
+            ret.type = self.searchType();
+        }
+        return ret;
     }
 
+    self.isLoading = ko.observable(false);
     self.getNnbs = function() {
+        self.isLoading(true);
         $.get("/nnbs/", getAjaxQueryData(), 
               function(result) {
+                self.isLoading(false);
                 buffer = new Array(result.nnbs.length);
                 $.each(result.nnbs, function(i, post) {
                     buffer[i] = new Nnb(post);
@@ -266,3 +306,19 @@ function NnbViewModel () {
         }
     };
 }
+
+ko.bindingHandlers.slideVisible = {
+    init: function(element, valueAccessor) {
+        var value = ko.unwrap(valueAccessor());
+        $(element).toggle(value);
+    },
+    update: function(element, valueAccessor, allBindingsAccessor) {
+        var value = ko.unwrap(valueAccessor()); 
+        var duration = 300;
+        if (value){
+            $(element).slideDown(duration);
+        }else{
+            $(element).slideUp(duration);
+        };
+    }
+};
