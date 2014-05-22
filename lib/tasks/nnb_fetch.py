@@ -31,7 +31,7 @@ import re
 users = set()
 
 
-def main(mongo_uri="localhost", start_date=None, end_date=None):
+def main(mongo_uri='mongodb://localhost:27017/carlapps', start_date=None, end_date=None):
     client = MongoClient(mongo_uri)
     if start_date is not None and end_date is not None:
         put_range_nnb_in_mongo(client, start_date=datetime.strptime(start_date, "%m/%d/%Y"),
@@ -87,7 +87,6 @@ def get_range_posts(start_date=datetime.today(),
                     end_date=datetime.today() + timedelta(1)):
     # Get an array of sections for the date range's nnb,
     # where each section is (title, content)
-    range_posts = []
     for today in daterange(start_date, end_date):
         today_html = get_html_for_date(today)
         sections = find_sections_in_html(today_html)
@@ -117,8 +116,8 @@ def get_range_posts(start_date=datetime.today(),
                     new_post["date"] = date
                 todays_posts.append(new_post)
                 post_index += 1
-        range_posts += todays_posts
-    return range_posts
+        for post in todays_posts:
+            yield post
 
 
 def daterange(start_date, end_date):
