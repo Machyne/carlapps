@@ -31,8 +31,8 @@ import re
 users = set()
 
 
-def main(mongo_url="localhost", start_date=None, end_date=None):
-    client = MongoClient(mongo_url, 27017)
+def main(mongo_uri="localhost", start_date=None, end_date=None):
+    client = MongoClient(mongo_uri)
     if start_date is not None and end_date is not None:
         put_range_nnb_in_mongo(client, start_date=datetime.strptime(start_date, "%m/%d/%Y"),
                                end_date=datetime.strptime(end_date, "%m/%d/%Y"))
@@ -56,7 +56,7 @@ def main(mongo_url="localhost", start_date=None, end_date=None):
 # used to put anchors on the names of users in posts
 def put_range_nnb_in_mongo(client, start_date=datetime.today(),
                            end_date=datetime.today() + timedelta(1)):
-    db = client.carlapps
+    db = client.get_default_database()
     load_global_users_set_from_collection(db.users)
     nnb_collection = db.nnbs
     range_posts = get_range_posts(start_date, end_date)
