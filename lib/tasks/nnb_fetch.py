@@ -31,12 +31,17 @@ import re
 users = set()
 
 
-def main():
-    # TODO: Give the correct address and port for the database
-    # TODO: Make sure user docs can be found in the collection carlapps.users
-    client = MongoClient("localhost", 27017)
-    put_range_nnb_in_mongo(client, start_date=datetime.today()-timedelta(weeks=20))
-
+def main(mongo_url="localhost", start_date=None, end_date=None):
+    client = MongoClient(mongo_url, 27017)
+    if start_date is not None and end_date is not None:
+        put_range_nnb_in_mongo(client, start_date=datetime.strptime(start_date, "%m/%d/%Y"),
+                               end_date=datetime.strptime(end_date, "%m/%d/%Y"))
+    elif start_date is not None:
+        put_range_nnb_in_mongo(client, start_date=datetime.strptime(start_date, "%m/%d/%Y"))
+    elif end_date is not None:
+        put_range_nnb_in_mongo(client, end_date=datetime.strptime(end_date, "%m/%d/%Y"))
+    else:
+        put_range_nnb_in_mongo(client)
     # Testing
     # load_global_users_set_from_collection(
         # MongoClient('localhost', 27017).pydb.users)
@@ -50,7 +55,7 @@ def main():
 # First generates a dictionary of users from carlapps.users which is
 # used to put anchors on the names of users in posts
 def put_range_nnb_in_mongo(client, start_date=datetime.today(),
-                           end_date=datetime.today()+timedelta(1)):
+                           end_date=datetime.today() + timedelta(1)):
     db = client.carlapps
     load_global_users_set_from_collection(db.users)
     nnb_collection = db.nnbs
@@ -79,7 +84,7 @@ def load_global_users_set_from_collection(users_collection):
 
 # Return an array of python dicts each representing a post in the range's nnb
 def get_range_posts(start_date=datetime.today(),
-                    end_date=datetime.today()+timedelta(1)):
+                    end_date=datetime.today() + timedelta(1)):
     # Get an array of sections for the date range's nnb,
     # where each section is (title, content)
     range_posts = []
@@ -124,7 +129,7 @@ def daterange(start_date, end_date):
 # Gets the HTML from apps.carleton.edu for the NNB for a specified date
 # TODO: For now, this function gets HTML from a test file
 def get_html_for_date(date):
-    if True:
+    if False:
         # Get HTML from nnb_test_html.html
         test_file = open('nnb_test_html2.html', 'r')
         s = test_file.read()
@@ -263,6 +268,6 @@ def wrap_web_address_match(match):
 
 
 if __name__ == "__main__":
-    print sys.argv
-    exit()
-    main()
+    args = {a.partition('=')[0].strip(): a.partition('=')[2].strip() for a in sys.argv[1:]}
+    main(**args)
+    print "success!"

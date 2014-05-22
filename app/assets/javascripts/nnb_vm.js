@@ -12,7 +12,7 @@ function NnbViewModel () {
     var types = ["events", "general", "wanted", "for sale", "lost & found", "housing", "ride share"];
     var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-    var today = new Date(new Date("05/21/14").toDateString() + " 00:00:00 GMT");
+    var today = new Date(new Date().toDateString() + " 00:00:00 CDT");
 
     // ================= //
     // The selected date //
