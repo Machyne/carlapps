@@ -24,6 +24,7 @@ from datetime import datetime, timedelta
 import urllib
 import string
 from urllib import urlencode
+import sys
 import re
 
 users = set()
@@ -248,6 +249,8 @@ def wrap_web_address_match(match):
 
 
 if __name__ == "__main__":
+    print sys.argv
+    exit()
     # TODO: Give the correct address and port for the database
     # TODO: Make sure user docs can be found in the collection carlapps.users
     client = MongoClient("localhost", 27017)
