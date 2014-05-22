@@ -5,7 +5,7 @@ namespace :dbinit do
 
   desc "Add today's NNB's into the database"
   task today: :environment do
-    db_url = 'mongo_url=' + (ENV['MONGOHQ_URL'] ? 'mongodb://fetc:data$$@oceanic.mongohq.com:10042/app17570829' : 'localhost')
+    db_url = 'mongo_url=' + (ENV['MONGOHQ_URL'] ? 'mongodb://fetch:data$$@oceanic.mongohq.com:10042/app17570829' : 'localhost')
     value = `python lib/tasks/nnb_fetch.py #{db_url}`
     p value
   end
