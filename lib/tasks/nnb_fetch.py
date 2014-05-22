@@ -20,25 +20,27 @@
 #    user            String
 
 from pymongo import MongoClient
-from datetime import datetime
+from datetime import datetime, timedelta
 import urllib
+import string
 from urllib import urlencode
 import re
 
 users = set()
 
 
-# Gets an array of posts (as dicts) from get_todays_posts
+# Gets an array of posts (as dicts) from get_range_posts
 # then processes and adds each one to carlapps.nnb
 #
 # First generates a dictionary of users from carlapps.users which is
 # used to put anchors on the names of users in posts
-def put_todays_nnb_in_mongo(client):
+def put_range_nnb_in_mongo(client, start_date=datetime.today(),
+                           end_date=datetime.today()+timedelta(1)):
     db = client.carlapps
     load_global_users_set_from_collection(db.users)
     nnb_collection = db.nnbs
-    todays_posts = get_todays_posts()
-    for post in todays_posts:
+    range_posts = get_range_posts(start_date, end_date)
+    for post in range_posts:
         # Note that a duplicate can occur on the same day
         duplicate_query = {"type": post["type"], "content": post["content"]}
         if "date" in post:
@@ -60,52 +62,61 @@ def load_global_users_set_from_collection(users_collection):
     return None
 
 
-# Return an array of python dicts each representing a post in today's nnb
-def get_todays_posts():
-    # Get an array of sections for today's nnb,
+# Return an array of python dicts each representing a post in the range's nnb
+def get_range_posts(start_date=datetime.today(),
+                    end_date=datetime.today()+timedelta(1)):
+    # Get an array of sections for the date range's nnb,
     # where each section is (title, content)
-    today = datetime.today()
-    today_html = get_html_for_date(today)
-    sections = find_sections_in_html(today_html)
-    # Process each section's content into an array of posts as text
-    # (Parse html to text, split into array of posts,
-    #   remove surrounding whitespace, leave out empty strings)
-    sections = [(title, filter(bool, [post.strip()
-                for post in posts_from_content(content)]))
-                for (title, content) in sections]
-    # Create a dict for each post
-    # Add anchors for users, email addresses, and web addresses
-    publish_date = get_publish_date_from_html(today_html)
-    todays_posts = []
-    post_index = 0
-    for section in sections:
-        type, date = type_and_date_from_title_and_publish_date(section[0],
-                                                               publish_date)
-        for post in section[1]:
-            post_with_anchors, contact = add_anchors_and_get_contact(post)
-            new_post = {"type": type,
-                        "content": post_with_anchors,
-                        "appeared": [publish_date],
-                        "appearedIndex": [post_index]}
-            if contact:
-                new_post["contact"] = contact
-            if date:
-                new_post["date"] = date
-            todays_posts.append(new_post)
-            post_index += 1
-    return todays_posts
+    range_posts = []
+    for today in daterange(start_date, end_date):
+        today_html = get_html_for_date(today)
+        sections = find_sections_in_html(today_html)
+        # Process each section's content into an array of posts as text
+        # (Parse html to text, split into array of posts,
+        #   remove surrounding whitespace, leave out empty strings)
+        sections = [(title, filter(bool, [post.strip()
+                    for post in posts_from_content(content)]))
+                    for (title, content) in sections]
+        # Create a dict for each post
+        # Add anchors for users, email addresses, and web addresses
+        publish_date = get_publish_date_from_html(today_html)
+        todays_posts = []
+        post_index = 0
+        for section in sections:
+            type, date = type_and_date_from_title_and_publish_date(section[0],
+                                                                   publish_date)
+            for post in section[1]:
+                post_with_anchors, contact = add_anchors_and_get_contact(post)
+                new_post = {"type": type,
+                            "content": post_with_anchors,
+                            "appeared": [publish_date],
+                            "appearedIndex": [post_index]}
+                if contact:
+                    new_post["contact"] = contact
+                if date:
+                    new_post["date"] = date
+                todays_posts.append(new_post)
+                post_index += 1
+        range_posts += todays_posts
+    return range_posts
+
+
+def daterange(start_date, end_date):
+    for n in xrange(int((end_date - start_date).days)):
+        yield start_date + timedelta(n)
 
 
 # Gets the HTML from apps.carleton.edu for the NNB for a specified date
 # TODO: For now, this function gets HTML from a test file
 def get_html_for_date(date):
-    # Get HTML from nnb_test_html.html
-    test_file = open('nnb_test_html.html', 'r')
-    s = test_file.read()
-    test_file.close()
-    return s
-    #
     if False:
+        # Get HTML from nnb_test_html.html
+        test_file = open('nnb_test_html2.html', 'r')
+        s = test_file.read()
+        test_file.close()
+        return s
+        #
+    else:
         nnb_url = "https://apps.carleton.edu/campact/nnb/local/show.php3"
         request = urlencode({'year': date.year,
                              'month': date.month,
@@ -120,16 +131,17 @@ def get_html_for_date(date):
 # Title and content should be parsed to remove HTML tags and entities
 def find_sections_in_html(nnb_html):
     flags = re.DOTALL | re.IGNORECASE
-    r = r'<br><b><u>(.*?)</u></b><br>(.*?)</p></td></tr>(?:</tbody>)?</table>'
+    r = r'<br><b><u>(.*?)</u></b><br>((?:.|\n)*?)(?:</p>)?</td></tr>(?:</tbody>)?</table>'
     pattern = re.compile(r, flags)
     return re.findall(pattern, nnb_html)
 
 
 # Split posts, remove nbsp, translate â��, remove extra newlines
 def posts_from_content(content):
-    parsed = re.sub("&nbsp;", lambda _: "", content)
-    parsed = re.sub(r"\xc3\xa2\xef\xbf\xbd\xef\xbf\xbd", lambda _: "'", parsed)
-    return parsed.split('<br class="ad">')
+    parsed = re.sub("&nbsp;|&acirc;", "", content)
+    parsed = filter(lambda x: x in string.printable, parsed)
+    posts = map(lambda x: x.strip(), re.split(r"\s+<br.*?>", parsed, flags=re.IGNORECASE)[1:])
+    return posts
 
 
 def get_publish_date_from_html(nnb_html):
@@ -239,10 +251,10 @@ if __name__ == "__main__":
     # TODO: Give the correct address and port for the database
     # TODO: Make sure user docs can be found in the collection carlapps.users
     client = MongoClient("localhost", 27017)
-    put_todays_nnb_in_mongo(client)
+    put_range_nnb_in_mongo(client, start_date=datetime.today()-timedelta(weeks=20))
 
     # Testing
     # load_global_users_set_from_collection(
         # MongoClient('localhost', 27017).pydb.users)
-    # for a in get_todays_posts():
+    # for a in get_range_posts():
     #     print a, '\n'

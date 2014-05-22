@@ -9,10 +9,10 @@ function NnbViewModel () {
         self.type = ko.observable(data.type);
     }
     var self = this;
-    var types = ["events", "general", "wanted", "for sale", "lost and found", "housing", "ride share"];
+    var types = ["events", "general", "wanted", "for sale", "lost & found", "housing", "ride share"];
     var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-    var today = new Date(new Date("09/26/12").toDateString() + " 00:00:00 GMT");
+    var today = new Date(new Date("05/21/14").toDateString() + " 00:00:00 GMT");
 
     // ================= //
     // The selected date //
