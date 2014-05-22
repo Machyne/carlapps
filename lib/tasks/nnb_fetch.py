@@ -26,7 +26,21 @@ import string
 from urllib import urlencode
 import re
 
+
 users = set()
+
+
+def main():
+    # TODO: Give the correct address and port for the database
+    # TODO: Make sure user docs can be found in the collection carlapps.users
+    client = MongoClient("localhost", 27017)
+    put_range_nnb_in_mongo(client, start_date=datetime.today()-timedelta(weeks=20))
+
+    # Testing
+    # load_global_users_set_from_collection(
+        # MongoClient('localhost', 27017).pydb.users)
+    # for a in get_range_posts():
+    #     print a, '\n'
 
 
 # Gets an array of posts (as dicts) from get_range_posts
@@ -248,13 +262,4 @@ def wrap_web_address_match(match):
 
 
 if __name__ == "__main__":
-    # TODO: Give the correct address and port for the database
-    # TODO: Make sure user docs can be found in the collection carlapps.users
-    client = MongoClient("localhost", 27017)
-    put_range_nnb_in_mongo(client, start_date=datetime.today()-timedelta(weeks=20))
-
-    # Testing
-    # load_global_users_set_from_collection(
-        # MongoClient('localhost', 27017).pydb.users)
-    # for a in get_range_posts():
-    #     print a, '\n'
+    main()
