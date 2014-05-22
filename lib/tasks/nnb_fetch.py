@@ -57,7 +57,6 @@ def main(mongo_url="localhost", start_date=None, end_date=None):
 def put_range_nnb_in_mongo(client, start_date=datetime.today(),
                            end_date=datetime.today() + timedelta(1)):
     db = client.carlapps
-    print db.nnbs.find_one({})
     load_global_users_set_from_collection(db.users)
     nnb_collection = db.nnbs
     range_posts = get_range_posts(start_date, end_date)
