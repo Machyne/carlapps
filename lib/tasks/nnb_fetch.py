@@ -110,7 +110,7 @@ def daterange(start_date, end_date):
 # Gets the HTML from apps.carleton.edu for the NNB for a specified date
 # TODO: For now, this function gets HTML from a test file
 def get_html_for_date(date):
-    if False:
+    if True:
         # Get HTML from nnb_test_html.html
         test_file = open('nnb_test_html2.html', 'r')
         s = test_file.read()
